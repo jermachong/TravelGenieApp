@@ -98,7 +98,7 @@ class _MainPageState extends State<MainPage> {
                   var jsonObject;
 
                   try {
-                    String url = 'https://travelgenie.com/login/api';
+                    String url = 'http://164.92.126.28:5000/api/login';                  
                     String ret = await CardsData.getJson(url, payload);
                     jsonObject = json.decode(ret);
                     userId = jsonObject["id"];
