@@ -87,6 +87,21 @@ Widget build(BuildContext context) {
             Navigator.pushNamed(context, '/login'); // Navigate to the Login screen
           },
         ),
+        SizedBox(height: 16.0), // Add spacing between the buttons
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue[50], // Background color
+            foregroundColor: Colors.black,    // Text color
+            padding: EdgeInsets.all(8.0),     // Button padding
+          ),
+          child: Text(
+            'Go to Landing Page',
+            style: TextStyle(fontSize: 14, color: Colors.black),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/landing'); // Navigate to the landing screen
+          },
+        ),
       ],
     ),
   );
