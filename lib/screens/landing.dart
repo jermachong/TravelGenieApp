@@ -4,9 +4,10 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 33, 37, 41), 
+      backgroundColor: Color.fromARGB(255, 33, 37, 41),
       appBar: AppBar(
-        backgroundColor: Colors.black, 
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.black,
         title: Text(
           'TravelGenie',
           style: TextStyle(color: Colors.white),
@@ -61,7 +62,7 @@ class LandingPage extends StatelessWidget {
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                // add logic
+                Navigator.pushNamed(context, '/plan-trip');
               },
               child: Text('Start Planning'),
               style: ElevatedButton.styleFrom(
@@ -78,9 +79,105 @@ class LandingPage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
+
+            // feature cards 
+            SizedBox(height: 48),
+            Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Everything you need to plan your perfect adventure',
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 24),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      _buildFeatureCard(
+                        icon: Icons.alt_route,
+                        title: 'Personalized Itineraries',
+                        description:
+                            'Get custom travel plans tailored to your preferences, budget, and schedule',
+                      ),
+                      _buildFeatureCard(
+                        icon: Icons.cloud,
+                        title: 'Weather Insights',
+                        description:
+                            'Make informed decisions with real-time weather forecasts for your destinations',
+                      ),
+                      _buildFeatureCard(
+                        icon: Icons.account_balance_wallet,
+                        title: 'Budget Tracking',
+                        description:
+                            'Easily monitor your expenses and stay within your travel budget',
+                      ),
+                      _buildFeatureCard(
+                        icon: Icons.map,
+                        title: 'Local Discoveries',
+                        description:
+                            'Explore hidden gems and authentic local experiences at your destination',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
+Widget _buildFeatureCard({
+  required IconData icon,
+  required String title,
+  required String description,
+}) {
+  return Container(
+    width: 250,
+    padding: EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Color(0xFF2C2C33),
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black26,
+          blurRadius: 6,
+          offset: Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        Icon(icon, size: 40, color: Colors.blueAccent),
+        SizedBox(height: 16),
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 8),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.white70,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    ),
+  );
+}
 }

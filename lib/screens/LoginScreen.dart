@@ -41,7 +41,15 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: IconThemeData(color: Colors.white), // back button color
+        title: Text(
+          'Login',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      backgroundColor: Color.fromARGB(255, 33, 37, 41),
       body: Center(
         child: Container(
           width: 300,
@@ -86,7 +94,7 @@ class _MainPageState extends State<MainPage> {
                   padding: EdgeInsets.all(8.0),
                 ),
                 child: Text(
-                  'Do Login',
+                  'Login',
                   style: TextStyle(fontSize: 14, color: Colors.black),
                 ),
                 onPressed: () async {
