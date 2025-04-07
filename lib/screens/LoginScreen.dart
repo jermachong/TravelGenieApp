@@ -27,9 +27,9 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 class _MainPageState extends State<MainPage> {
-  String loginName = ''; // Variable to store the login name
-  String password = ''; // Variable to store the password
-  String newMessageText = ''; // Variable to store the message
+  String loginName = ''; 
+  String password = ''; 
+  String newMessageText = ''; 
 
   // Method to update the message
   void changeText() {
@@ -43,7 +43,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white), // back button color
+        iconTheme: IconThemeData(color: Colors.white), 
         title: Text(
           'Login',
           style: TextStyle(color: Colors.white),
@@ -66,7 +66,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    loginName = text; // Update loginName as the user types
+                    loginName = text; // update while typing
                   });
                 },
               ),
@@ -82,7 +82,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    password = text; // Update password as the user types
+                    password = text; // update password while type
                   });
                 },
               ),
@@ -109,7 +109,8 @@ class _MainPageState extends State<MainPage> {
                     String url = 'http://164.92.126.28:5000/api/login';                  
                     String ret = await CardsData.getJson(url, payload);
                     jsonObject = json.decode(ret);
-                    userId = jsonObject["id"];
+                    print("API response: $jsonObject"); // debug
+                    userId = jsonObject["userId"] ?? -1; // fix login
                   } catch (e) {
                     newMessageText = e.toString();
                     changeText();
@@ -125,7 +126,7 @@ class _MainPageState extends State<MainPage> {
                     GlobalData.lastName = jsonObject["lastName"];
                     GlobalData.loginName = loginName;
                     GlobalData.password = password;
-                    Navigator.pushNamed(context, '/cards');
+                    Navigator.pushNamed(context, '/saved-trips'); // i changed
                   }
                 },
               ),
