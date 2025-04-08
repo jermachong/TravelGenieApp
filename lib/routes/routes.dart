@@ -4,7 +4,7 @@ import 'package:my_first_app/screens/CardsScreen.dart';
 import 'package:my_first_app/screens/landing.dart';
 import 'package:my_first_app/screens/planTrip.dart'; 
 import 'package:my_first_app/screens/savedTrips.dart';
-import 'package:my_first_app/main.dart'; // Import MyHomePage
+//import 'package:my_first_app/main.dart'; // Import MyHomePage
 
 class Routes {
   static const String LOGINSCREEN = '/login';
@@ -15,8 +15,8 @@ class Routes {
 
   // Routes of pages in the app
   static Map<String, Widget Function(BuildContext)> get getroutes => {
-    '/': (context) => MyHomePage(title: 'Home Page'), // Set MyHomePage as the initial route 
-    LOGINSCREEN: (context) => LoginScreen(), // need to set landpage as initial route. 
+    '/': (context) => LandingPage(), // Set landing page as the initial route 
+    LOGINSCREEN: (context) => LoginScreen(), 
     CARDSSCREEN: (context) => CardsScreen(),
     LANDINGSCREEN: (context) => LandingPage(),
     PLANTRIPSCREEN: (context) => PlanTripPage(), 

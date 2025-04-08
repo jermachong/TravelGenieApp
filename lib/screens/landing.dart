@@ -18,6 +18,8 @@ class LandingPage extends StatelessWidget {
             onSelected: (value) {
               if (value == 'login') {
                 Navigator.pushNamed(context, '/login');
+              } else if (value == 'create') {
+                Navigator.pushNamed(context, '/cards'); // assuming '/cards' is your create account route
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -25,7 +27,10 @@ class LandingPage extends StatelessWidget {
                 value: 'login',
                 child: Text('Login'),
               ),
-              // add more
+              PopupMenuItem<String>(
+                value: 'create',
+                child: Text('Create Account'),
+              ),
             ],
           ),
         ],
