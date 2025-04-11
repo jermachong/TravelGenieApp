@@ -279,10 +279,27 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Saved Trips'),
-        backgroundColor: Colors.black, // Dark theme for the AppBar
+        title: Text(
+          'Saved Trips',
+          style: TextStyle(color: Colors.white), // Set the title font color to white
+        ),
+        backgroundColor: Colors.black, // Keep the background color black
+        iconTheme: IconThemeData(color: Colors.white), // Set the icon color to white
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: _handleMenuOption,
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'Change Name', child: Text('Change Name')),
+                PopupMenuItem(value: 'Change Email', child: Text('Change Email')),
+                PopupMenuItem(value: 'Change Password', child: Text('Change Password')),
+                PopupMenuItem(value: 'Logout', child: Text('Logout')),
+              ];
+            },
+          ),
+        ],
       ),
-      backgroundColor: Color.fromARGB(255, 33, 37, 41), // Dark theme for the background
+      backgroundColor: Color.fromARGB(255, 33, 37, 41),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
@@ -300,19 +317,6 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
                           'No saved trips found.',
                           style: TextStyle(color: Colors.white),
                         ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/plan-trip').then((_) {
-                              fetchSavedTrips(); // Refresh saved trips when returning
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text('Plan a New Trip'),
-                        ),
                       ],
                     )
                   : Column(
@@ -321,15 +325,15 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
                           child: ListView.builder(
                             itemCount: savedTrips.length,
                             itemBuilder: (context, index) {
-                              final trip = savedTrips[index]['Itinerary']; // Access the nested Itinerary object
-                              final title = trip['title'] ?? 'No Title'; // Safely access the title
-                              final description = trip['description'] ?? 'No Description'; // Safely access the description
+                              final trip = savedTrips[index]['Itinerary'];
+                              final title = trip['title'] ?? 'No Title';
+                              final description = trip['description'] ?? 'No Description';
 
                               return ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Add padding
+                                contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                                 leading: trip['image'] != null && trip['image'].isNotEmpty
                                     ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.0), // Optional: Rounded corners
+                                        borderRadius: BorderRadius.circular(8.0),
                                         child: Image.network(
                                           trip['image'],
                                           width: 50,
@@ -375,21 +379,17 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
                             },
                           ),
                         ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/plan-trip').then((_) {
-                              fetchSavedTrips(); // Refresh saved trips when returning
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text('Plan a New Trip'),
-                        ),
                       ],
                     ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/plan-trip').then((_) {
+            fetchSavedTrips(); // Refresh saved trips when returning
+          });
+        },
+        backgroundColor: Colors.blueAccent,
+        child: Icon(Icons.add, color: Colors.white), // Plus icon
+      ),
     );
   }
 }
