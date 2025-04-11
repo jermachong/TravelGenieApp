@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:my_first_app/utils/getAPI.dart';
+import 'package:http/http.dart' as http;
+import 'package:my_first_app/screens/tripDetails.dart'; // Update the path if necessary
 
-class GlobalData {
-  static int userId = 82;
-  static String firstName = "R";
-  static String lastName = "4331";
-  static String email = "r@example.com";
-  static String password = "********";
-}
+// class GlobalData {
+//   static int userId = 82;
+//   static String firstName = "R";
+//   static String lastName = "4331";
+//   static String email = "r@example.com";
+//   static String password = "********";
+// }
 
 class SavedTripsPage extends StatefulWidget {
   @override
@@ -17,11 +19,16 @@ class SavedTripsPage extends StatefulWidget {
 
 class _SavedTripsPageState extends State<SavedTripsPage> {
   String statusMessage = '';
+  List<dynamic> savedTrips = [];
+  bool isLoading = false;
+  String errorMessage = '';
 
   @override
   void initState() {
     super.initState();
+    print('GlobalData.userId: ${GlobalData.userId}');
     _refreshUserInfo();
+    fetchSavedTrips();
   }
 
   Future<void> _refreshUserInfo() async {
@@ -30,13 +37,72 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
       String payload = json.encode({ "userId": GlobalData.userId });
       String response = await CardsData.getJson(url, payload);
       var jsonObject = json.decode(response);
+
       setState(() {
+        GlobalData.userId = jsonObject["userId"]; // Update userId
         GlobalData.firstName = jsonObject["firstName"];
         GlobalData.lastName = jsonObject["lastName"];
         GlobalData.email = jsonObject["email"];
       });
+
+      print('User info refreshed. UserId: ${GlobalData.userId}');
     } catch (e) {
       print("Error loading user info: $e");
+    }
+  }
+
+  Future<void> fetchSavedTrips() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      final userId = GlobalData.userId.toString();
+      final payload = {
+        'userId': userId,
+        'itineraryName': '',
+      };
+
+      print('Request payload: $payload');
+
+      final response = await http.post(
+        Uri.parse('http://164.92.126.28:5000/api/searchItinerary'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      print('Response status: ${response.statusCode}');
+      //print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final itineraries = data['Itineraries'];
+        //print('Fetched itineraries: $itineraries'); // Debug the fetched data
+        setState(() {
+          savedTrips = itineraries.map((trip) {
+            final itinerary = trip['Itinerary'];
+            itinerary['image'] = itinerary['image']?.startsWith('http') == true
+                ? itinerary['image']
+                : null; // Set to null if the URL is invalid
+            return trip;
+          }).toList();
+        });
+        //print('Saved trips: $savedTrips');
+      } else {
+        final errorData = json.decode(response.body);
+        setState(() {
+          errorMessage = errorData['error'] ?? 'Failed to fetch saved trips. Please try again.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'An error occurred: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -212,30 +278,118 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 33, 37, 41), //Color(0xFF28242C),
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text('Saved Trips', style: TextStyle(color: Colors.white)),
-        actions: [
-          PopupMenuButton<String>(
-            icon: Icon(Icons.settings, color: Colors.white),
-            onSelected: _handleMenuOption,
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'Change Name', child: Text('Change Name')),
-              PopupMenuItem(value: 'Change Email', child: Text('Change Email')),
-              PopupMenuItem(value: 'Change Password', child: Text('Change Password')),
-              PopupMenuItem(value: 'Logout', child: Text('Logout')),
-            ],
-          ),
-        ],
+        title: Text('Saved Trips'),
+        backgroundColor: Colors.black, // Dark theme for the AppBar
       ),
-      body: Center(
-        child: Text(
-          statusMessage.isEmpty ? 'No saved trips yet.' : statusMessage,
-          style: TextStyle(fontSize: 18, color: Colors.white70),
-        ),
-      ),
+      backgroundColor: Color.fromARGB(255, 33, 37, 41), // Dark theme for the background
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+              ? Center(
+                  child: Text(
+                    errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
+              : savedTrips.isEmpty
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'No saved trips found.',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/plan-trip').then((_) {
+                              fetchSavedTrips(); // Refresh saved trips when returning
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('Plan a New Trip'),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: savedTrips.length,
+                            itemBuilder: (context, index) {
+                              final trip = savedTrips[index]['Itinerary']; // Access the nested Itinerary object
+                              final title = trip['title'] ?? 'No Title'; // Safely access the title
+                              final description = trip['description'] ?? 'No Description'; // Safely access the description
+
+                              return ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Add padding
+                                leading: trip['image'] != null && trip['image'].isNotEmpty
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.0), // Optional: Rounded corners
+                                        child: Image.network(
+                                          trip['image'],
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(Icons.broken_image, color: Colors.grey, size: 50);
+                                          },
+                                        ),
+                                      )
+                                    : Icon(Icons.image, color: Colors.grey, size: 50),
+                                title: Text(
+                                  title,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      description,
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    Text(
+                                      'Destination: ${trip['destination'] ?? 'Unknown'}',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    Text(
+                                      'Price: \$${trip['price'] ?? 'N/A'}',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  print('Navigating to TripDetailsPage with trip: ${savedTrips[index]}');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TripDetailsPage(trip: savedTrips[index]),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/plan-trip').then((_) {
+                              fetchSavedTrips(); // Refresh saved trips when returning
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('Plan a New Trip'),
+                        ),
+                      ],
+                    ),
     );
   }
 }

@@ -30,4 +30,5 @@ class GlobalData {
   static String lastName = '';
   static String loginName = '';
   static String password = '';
+  static String email = ''; // Add this field
 }

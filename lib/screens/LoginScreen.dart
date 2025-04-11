@@ -26,6 +26,7 @@ class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
 }
+
 class _MainPageState extends State<MainPage> {
   String loginName = ''; 
   String password = ''; 
@@ -36,6 +37,35 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       // Update the UI with the new message
     });
+  }
+
+  Future<void> _refreshUserInfo() async {
+    try {
+      if (GlobalData.userId <= 0) {
+        print("Invalid userId in GlobalData. Skipping refresh.");
+        return;
+      }
+
+      String url = 'http://164.92.126.28:5000/api/get-user';
+      String payload = json.encode({ "userId": GlobalData.userId });
+      print('Requesting user info with payload: $payload');
+
+      String response = await CardsData.getJson(url, payload);
+      print('Response from get-user: $response');
+
+      var jsonObject = json.decode(response);
+
+      setState(() {
+        // Only update additional user details, not userId
+        GlobalData.firstName = jsonObject["firstName"];
+        GlobalData.lastName = jsonObject["lastName"];
+        GlobalData.email = jsonObject["email"];
+      });
+
+      print('User info refreshed. UserId: ${GlobalData.userId}');
+    } catch (e) {
+      print("Error loading user info: $e");
+    }
   }
 
   @override
@@ -126,6 +156,8 @@ class _MainPageState extends State<MainPage> {
                     GlobalData.lastName = jsonObject["lastName"];
                     GlobalData.loginName = loginName;
                     GlobalData.password = password;
+                    print("GlobalData updated: UserId=${GlobalData.userId}, FirstName=${GlobalData.firstName}, LastName=${GlobalData.lastName}");
+
                     Navigator.pushNamed(context, '/saved-trips'); // i changed
                   }
                 },

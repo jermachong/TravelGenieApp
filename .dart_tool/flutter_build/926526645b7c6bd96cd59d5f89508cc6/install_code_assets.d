@@ -1,0 +1,1 @@
+ /Users/Owner/Cindy\ Tran\ Team\ Dropbox/Jeremy\ Achong/Mac/Documents/GitHub/TravelGenieApp/.dart_tool/flutter_build/926526645b7c6bd96cd59d5f89508cc6/native_assets.json: 

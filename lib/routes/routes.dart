@@ -12,6 +12,7 @@ class Routes {
   static const String LANDINGSCREEN = '/landing';
   static const String PLANTRIPSCREEN = '/plan-trip'; 
   static const String SAVEDTRIPSSCREEN = '/saved-trips';
+  //static const String TRIPDETAILSSCREEN = '/tripDetails'; // Add this line
 
   // Routes of pages in the app
   static Map<String, Widget Function(BuildContext)> get getroutes => {
@@ -21,5 +22,6 @@ class Routes {
     LANDINGSCREEN: (context) => LandingPage(),
     PLANTRIPSCREEN: (context) => PlanTripPage(), 
     SAVEDTRIPSSCREEN: (context) => SavedTripsPage(),
+    //TRIPDETAILSSCREEN: (context) => TripDetailsPage(), // Pass an empty map for now
   };
 }
