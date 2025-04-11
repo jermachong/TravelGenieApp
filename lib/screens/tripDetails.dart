@@ -93,6 +93,66 @@ class TripDetailsPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
 
+                // Quick Details Section
+                Card(
+                  color: Colors.grey[850],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today, color: Colors.orangeAccent),
+                            SizedBox(width: 8),
+                            Text(
+                              'Duration: ${itinerary['duration'] ?? 'N/A'} days',
+                              style: TextStyle(fontSize: 16, color: Colors.grey[300]),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on, color: Colors.blueAccent),
+                            SizedBox(width: 8),
+                            Text(
+                              'Destination(s): ${itinerary['destination'] ?? 'Unknown'}',
+                              style: TextStyle(fontSize: 16, color: Colors.grey[300]),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.group, color: Colors.purpleAccent),
+                            SizedBox(width: 8),
+                            Text(
+                              'People: ${itinerary['groupSize'] ?? 'N/A'}',
+                              style: TextStyle(fontSize: 16, color: Colors.grey[300]),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.attach_money, color: Colors.greenAccent),
+                            SizedBox(width: 8),
+                            Text(
+                              'Budget: \$${itinerary['price'] ?? 'N/A'}',
+                              style: TextStyle(fontSize: 16, color: Colors.grey[300]),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+
                 // Daily Breakdown
                 ...dailyBreakdown.map<Widget>((day) {
                   return Column(
