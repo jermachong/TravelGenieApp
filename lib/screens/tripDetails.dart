@@ -57,17 +57,15 @@ class TripDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final itinerary = trip['Itinerary'];
     final dailyBreakdown = itinerary['dailyBreakdown'] ?? [];
-    final userId = GlobalData.userId; // Use GlobalData.userId
+    final userId = GlobalData.userId;
     final itineraryId = trip['Itinerary']['itineraryId'];
 
-    print('TripDetailsPage received userId from GlobalData: $userId, itineraryId: $itineraryId');
+    print('TripDetailsPage received userId: $userId, itineraryId: $itineraryId');
 
     return Scaffold(
       appBar: AppBar(
         title: Text(itinerary['title'] ?? 'Trip Details', style: TextStyle(color: Colors.white)),
-        
         backgroundColor: Colors.black,
-        
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -83,24 +81,6 @@ class TripDetailsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Trip Image with Hero Animation
-                itinerary['image'] != null && itinerary['image'].isNotEmpty
-                    ? Hero(
-                        tag: itinerary['title'] ?? 'trip-image',
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
-                          child: Image.network(
-                            itinerary['image'],
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.broken_image, color: Colors.grey, size: 100);
-                            },
-                          ),
-                        ),
-                      )
-                    : Icon(Icons.image, color: Colors.grey, size: 100),
-                SizedBox(height: 16),
-
                 // Trip Summary
                 Text(
                   itinerary['title'] ?? 'No Title',
@@ -113,115 +93,92 @@ class TripDetailsPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
 
-                // Trip Details with Icons
-                Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.blueAccent),
-                    SizedBox(width: 8),
-                    Text(
-                      'Destination: ${itinerary['destination'] ?? 'Unknown'}',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[300]),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.attach_money, color: Colors.greenAccent),
-                    SizedBox(width: 8),
-                    Text(
-                      'Price: \$${itinerary['price'] ?? 'N/A'}',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[300]),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, color: Colors.orangeAccent),
-                    SizedBox(width: 8),
-                    Text(
-                      'Duration: ${itinerary['duration']} days',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[300]),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.group, color: Colors.purpleAccent),
-                    SizedBox(width: 8),
-                    Text(
-                      'Group Size: ${itinerary['groupSize']} people',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[300]),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-
                 // Daily Breakdown
-                Text(
-                  'Daily Breakdown:',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                SizedBox(height: 8),
                 ...dailyBreakdown.map<Widget>((day) {
-                  return Card(
-                    color: Colors.grey[850],
-                    margin: EdgeInsets.symmetric(vertical: 8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Day ${day['day']}:',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
-                          ),
-                          SizedBox(height: 8),
-                          ...day['activities'].map<Widget>((activity) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(Icons.check_circle, color: Colors.greenAccent, size: 16),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      '${activity['time']} - ${activity['activity']} (${activity['location']})\nDetails: ${activity['details']}',
-                                      style: TextStyle(fontSize: 14, color: Colors.grey[300]),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ],
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Day Header
+                      Text(
+                        'Day ${day['day']}: ${day['date'] ?? ''}',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueAccent),
                       ),
-                    ),
+                      SizedBox(height: 8),
+
+                      // Activities List
+                      ...day['activities'].map<Widget>((activity) {
+                        return Card(
+                          margin: EdgeInsets.symmetric(vertical: 8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Icon
+                                Icon(Icons.location_on, color: Colors.blueAccent, size: 24),
+                                SizedBox(width: 12),
+
+                                // Activity Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        activity['activity'] ?? 'No Activity',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        '${activity['time'] ?? ''} - ${activity['location'] ?? ''}',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        activity['details'] ?? '',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Action Button
+                                if (activity['action'] != null)
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // Handle button action
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    ),
+                                    child: Text(activity['action'] ?? 'Action'),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
                   );
                 }).toList(),
 
                 // Delete Trip Button
                 SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-                  child: Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () => deleteTrip(context),
-                      icon: Icon(Icons.delete, color: Colors.white),
-                      label: Text(
-                        'Delete Trip',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                      ),
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () => deleteTrip(context),
+                    icon: Icon(Icons.delete, color: Colors.white),
+                    label: Text(
+                      'Delete Trip',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                     ),
                   ),
                 ),
