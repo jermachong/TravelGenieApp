@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_first_app/utils/getAPI.dart'; // Adjust the import based on your project structure
 
 dynamic itinerary; // Placeholder for itinerary data
 
@@ -79,7 +80,8 @@ class _PlanTripPageState extends State<PlanTripPage> {
 
     try {
       // Replace with actual logic to retrieve the userId and jwtToken
-      final userId = "12345"; // Replace with the actual user ID
+      //final userId = "12345"; // Replace with the actual user ID
+      final userId = GlobalData.userId.toString(); // Use the userId from GlobalData
       final jwtToken = "your_jwt_token"; // Replace with the actual JWT token
 
       if (userId.isEmpty || jwtToken.isEmpty) {
