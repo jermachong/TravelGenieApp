@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_first_app/utils/getAPI.dart';
 
 class LandingPage extends StatelessWidget {
   @override
@@ -19,19 +20,39 @@ class LandingPage extends StatelessWidget {
               if (value == 'login') {
                 Navigator.pushNamed(context, '/login');
               } else if (value == 'create') {
-                Navigator.pushNamed(context, '/cards'); // assuming '/cards' is your create account route
+                Navigator.pushNamed(context, '/cards');
+              } else if (value == 'saved') {
+                Navigator.pushNamed(context, '/saved-trips');
+              } else if (value == 'logout') {
+                GlobalData.loggedIn = false;
+                Navigator.pushReplacementNamed(context, '/landing');
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'login',
-                child: Text('Login'),
-              ),
-              PopupMenuItem<String>(
-                value: 'create',
-                child: Text('Create Account'),
-              ),
-            ],
+            itemBuilder: (context) {
+              if (GlobalData.loggedIn) {
+                return [
+                  PopupMenuItem<String>(
+                    value: 'saved',
+                    child: Text('Saved Trips'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'logout',
+                    child: Text('Logout'),
+                  ),
+                ];
+              } else {
+                return [
+                  PopupMenuItem<String>(
+                    value: 'login',
+                    child: Text('Login'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'create',
+                    child: Text('Create Account'),
+                   ),
+                ];
+              }
+            },
           ),
         ],
       ),
@@ -67,7 +88,11 @@ class LandingPage extends StatelessWidget {
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/plan-trip');
+                if (GlobalData.loggedIn) {
+                  Navigator.pushNamed(context, '/plan-trip');
+                } else {
+                  Navigator.pushNamed(context, '/cards'); // route to create account
+                }
               },
               child: Text('Start Planning'),
               style: ElevatedButton.styleFrom(

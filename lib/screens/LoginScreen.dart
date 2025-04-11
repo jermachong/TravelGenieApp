@@ -32,40 +32,8 @@ class _MainPageState extends State<MainPage> {
   String password = ''; 
   String newMessageText = ''; 
 
-  // Method to update the message
   void changeText() {
-    setState(() {
-      // Update the UI with the new message
-    });
-  }
-
-  Future<void> _refreshUserInfo() async {
-    try {
-      if (GlobalData.userId <= 0) {
-        print("Invalid userId in GlobalData. Skipping refresh.");
-        return;
-      }
-
-      String url = 'http://164.92.126.28:5000/api/get-user';
-      String payload = json.encode({ "userId": GlobalData.userId });
-      print('Requesting user info with payload: $payload');
-
-      String response = await CardsData.getJson(url, payload);
-      print('Response from get-user: $response');
-
-      var jsonObject = json.decode(response);
-
-      setState(() {
-        // Only update additional user details, not userId
-        GlobalData.firstName = jsonObject["firstName"];
-        GlobalData.lastName = jsonObject["lastName"];
-        GlobalData.email = jsonObject["email"];
-      });
-
-      print('User info refreshed. UserId: ${GlobalData.userId}');
-    } catch (e) {
-      print("Error loading user info: $e");
-    }
+    setState(() {});
   }
 
   @override
@@ -74,10 +42,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: IconThemeData(color: Colors.white), 
-        title: Text(
-          'Login',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text('Login', style: TextStyle(color: Colors.white)),
       ),
       backgroundColor: Color.fromARGB(255, 33, 37, 41),
       body: Center(
@@ -96,7 +61,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    loginName = text; // update while typing
+                    loginName = text;
                   });
                 },
               ),
@@ -112,7 +77,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    password = text; // update password while type
+                    password = text;
                   });
                 },
               ),
@@ -123,10 +88,7 @@ class _MainPageState extends State<MainPage> {
                   foregroundColor: Colors.black,
                   padding: EdgeInsets.all(8.0),
                 ),
-                child: Text(
-                  'Login',
-                  style: TextStyle(fontSize: 14, color: Colors.black),
-                ),
+                child: Text('Login', style: TextStyle(fontSize: 14, color: Colors.black)),
                 onPressed: () async {
                   newMessageText = "";
                   changeText();
@@ -139,8 +101,7 @@ class _MainPageState extends State<MainPage> {
                     String url = 'http://164.92.126.28:5000/api/login';                  
                     String ret = await CardsData.getJson(url, payload);
                     jsonObject = json.decode(ret);
-                    print("API response: $jsonObject"); // debug
-                    userId = jsonObject["userId"] ?? -1; // fix login
+                    userId = jsonObject["userId"] ?? -1;
                   } catch (e) {
                     newMessageText = e.toString();
                     changeText();
@@ -156,16 +117,28 @@ class _MainPageState extends State<MainPage> {
                     GlobalData.lastName = jsonObject["lastName"];
                     GlobalData.loginName = loginName;
                     GlobalData.password = password;
-                    print("GlobalData updated: UserId=${GlobalData.userId}, FirstName=${GlobalData.firstName}, LastName=${GlobalData.lastName}");
 
-                    Navigator.pushNamed(context, '/saved-trips'); // i changed
+                    Navigator.pushNamed(context, '/saved-trips');
                   }
                 },
               ),
               SizedBox(height: 16.0),
               Text(
-                newMessageText, // Display the message
+                newMessageText,
                 style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
+              SizedBox(height: 32.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  side: BorderSide(color: Colors.blueAccent),
+                  foregroundColor: Colors.blueAccent,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/cards');
+                },
+                child: Text("Create Account"),
               ),
             ],
           ),
@@ -174,6 +147,3 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-
-
-

@@ -31,4 +31,5 @@ class GlobalData {
   static String loginName = '';
   static String password = '';
   static String email = ''; // Add this field
+  static bool loggedIn = false; 
 }

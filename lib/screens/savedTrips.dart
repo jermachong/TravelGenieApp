@@ -43,6 +43,7 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
         GlobalData.firstName = jsonObject["firstName"];
         GlobalData.lastName = jsonObject["lastName"];
         GlobalData.email = jsonObject["email"];
+        GlobalData.loggedIn = true; 
       });
 
       print('User info refreshed. UserId: ${GlobalData.userId}');
@@ -134,8 +135,12 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
           },
         );
         break;
+      case 'Landing':
+        Navigator.pushReplacementNamed(context, '/landing');
+        break;
       case 'Logout':
-        Navigator.pushNamed(context, '/login');
+        GlobalData.loggedIn = false;
+        Navigator.pushNamed(context, '/landing');
         break;
     }
   }
@@ -293,6 +298,7 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
                 PopupMenuItem(value: 'Change Name', child: Text('Change Name')),
                 PopupMenuItem(value: 'Change Email', child: Text('Change Email')),
                 PopupMenuItem(value: 'Change Password', child: Text('Change Password')),
+                PopupMenuItem(value: 'Landing', child: Text('Go to Landing Page')), 
                 PopupMenuItem(value: 'Logout', child: Text('Logout')),
               ];
             },
