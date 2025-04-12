@@ -65,35 +65,28 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
         'itineraryName': '',
       };
 
-      print('Request payload: $payload');
-
       final response = await http.post(
         Uri.parse('http://164.92.126.28:5000/api/searchItinerary'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
       );
 
-      print('Response status: ${response.statusCode}');
-      //print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final itineraries = data['Itineraries'];
-        //print('Fetched itineraries: $itineraries'); // Debug the fetched data
+
         setState(() {
-          savedTrips = itineraries.map((trip) {
-            final itinerary = trip['Itinerary'];
-            itinerary['image'] = itinerary['image']?.startsWith('http') == true
-                ? itinerary['image']
-                : null; // Set to null if the URL is invalid
-            return trip;
+          savedTrips = itineraries.map<Map<String, dynamic>>((trip) {
+            return {
+              'itineraryId': trip['itineraryId'], // Ensure itineraryId is included
+              'Itinerary': trip['Itinerary'],    // Ensure Itinerary is properly mapped
+            };
           }).toList();
         });
-        //print('Saved trips: $savedTrips');
       } else {
         final errorData = json.decode(response.body);
         setState(() {
-          errorMessage = errorData['error'] ?? 'Failed to fetch saved trips. Please try again.';
+          errorMessage = errorData['error'] ?? 'Failed to fetch saved trips.';
         });
       }
     } catch (e) {
@@ -335,52 +328,92 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
                               final title = trip['title'] ?? 'No Title';
                               final description = trip['description'] ?? 'No Description';
 
-                              return ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                leading: trip['image'] != null && trip['image'].isNotEmpty
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8.0),
-                                        child: Image.network(
-                                          trip['image'],
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Icon(Icons.broken_image, color: Colors.grey, size: 50);
-                                          },
-                                        ),
-                                      )
-                                    : Icon(Icons.image, color: Colors.grey, size: 50),
-                                title: Text(
-                                  title,
-                                  style: TextStyle(color: Colors.white),
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    // Navigate to TripDetailsPage with the selected trip
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TripDetailsPage(trip: savedTrips[index]),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    color: Colors.grey[850],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    elevation: 4,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Trip Image
+                                          trip['image'] != null && trip['image'].isNotEmpty
+                                              ? ClipRRect(
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                  child: Image.network(
+                                                    trip['image'],
+                                                    width: 80,
+                                                    height: 80,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context, error, stackTrace) {
+                                                      return Icon(Icons.broken_image, color: Colors.grey, size: 80);
+                                                    },
+                                                  ),
+                                                )
+                                              : Icon(Icons.image, color: Colors.grey, size: 80),
+
+                                          SizedBox(width: 16),
+
+                                          // Trip Details
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  title,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  description,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey[400],
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Destination: ${trip['destination'] ?? 'Unknown'}',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey[400],
+                                                  ),
+                                                ),
+                                                SizedBox(height: 4),
+                                                Text(
+                                                  'Price: \$${trip['price'] ?? 'N/A'}',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey[400],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      description,
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                    Text(
-                                      'Destination: ${trip['destination'] ?? 'Unknown'}',
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                    Text(
-                                      'Price: \$${trip['price'] ?? 'N/A'}',
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  print('Navigating to TripDetailsPage with trip: ${savedTrips[index]}');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TripDetailsPage(trip: savedTrips[index]),
-                                    ),
-                                  );
-                                },
                               );
                             },
                           ),

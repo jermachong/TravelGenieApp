@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:my_first_app/utils/getAPI.dart'; // Update the path as necessary
+import 'package:my_first_app/screens/savedTrips.dart'; // Import SavedTripsPage
 
 class TripDetailsPage extends StatelessWidget {
   final Map<String, dynamic> trip;
@@ -9,19 +10,25 @@ class TripDetailsPage extends StatelessWidget {
   TripDetailsPage({required this.trip});
 
   Future<void> deleteTrip(BuildContext context) async {
-    final userId = GlobalData.userId; // Use GlobalData.userId
-    final itineraryName = trip['Itinerary']['title']; // Use the itinerary name instead of itineraryId
+    final itineraryDetails = await fetchItineraryDetails(context);
 
-    if (userId == null || itineraryName == null) {
+    if (itineraryDetails == null) {
+      return; // Exit if the itinerary details could not be fetched
+    }
+
+    final userId = GlobalData.userId;
+    final itineraryId = itineraryDetails['ItineraryId']; // Correctly access ItineraryId
+
+    if (userId == null || itineraryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Missing userId or itinerary name')),
+        SnackBar(content: Text('Missing userId or itineraryId')),
       );
       return;
     }
 
     final payload = {
       'userId': userId,
-      'itineraryName': itineraryName, // Use itineraryName as required by the API
+      'itineraryId': itineraryId,
     };
 
     try {
@@ -34,23 +41,76 @@ class TripDetailsPage extends StatelessWidget {
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200 && responseData['message'] != null) {
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
-        Navigator.pop(context); // Go back to the previous screen
+
+        // Navigate back to SavedTripsPage and refresh
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SavedTripsPage(), // Ensure this is imported
+          ),
+          (route) => false, // Remove all previous routes
+        );
       } else {
-        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['error'] ?? 'Failed to delete trip')),
         );
       }
     } catch (e) {
-      // Handle network or other errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),
       );
     }
+  }
+
+  Future<Map<String, dynamic>?> fetchItineraryDetails(BuildContext context) async {
+    final userId = GlobalData.userId;
+    final itineraryName = trip['Itinerary']['title']; // Use the title to search
+
+    if (userId == null || itineraryName == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Missing userId or itinerary name')),
+      );
+      return null;
+    }
+
+    final payload = {
+      'userId': userId,
+      'itineraryName': itineraryName,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://164.92.126.28:5000/api/searchItinerary'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['Itineraries'] != null && responseData['Itineraries'].isNotEmpty) {
+          final itinerary = responseData['Itineraries'][0];
+          print('Fetched itinerary details: $itinerary'); // Debugging
+          return itinerary; // Return the full itinerary object
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Itinerary not found')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch itinerary details')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
+    }
+
+    return null;
   }
 
   @override
