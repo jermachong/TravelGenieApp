@@ -75,19 +75,37 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
         final data = json.decode(response.body);
         final itineraries = data['Itineraries'];
 
-        setState(() {
-          savedTrips = itineraries.map<Map<String, dynamic>>((trip) {
-            return {
-              'itineraryId': trip['itineraryId'], // Ensure itineraryId is included
-              'Itinerary': trip['Itinerary'],    // Ensure Itinerary is properly mapped
-            };
-          }).toList();
-        });
+        if (itineraries == null || itineraries.isEmpty) {
+          setState(() {
+            savedTrips = [];
+            errorMessage = 'No saved trips found.';
+          });
+        } else {
+          setState(() {
+            savedTrips = itineraries.map<Map<String, dynamic>>((trip) {
+              return {
+                'itineraryId': trip['ItineraryId'], // Ensure itineraryId is included
+                'Itinerary': trip['Itinerary'],    // Ensure Itinerary is properly mapped
+              };
+            }).toList();
+          });
+        }
       } else {
         final errorData = json.decode(response.body);
-        setState(() {
-          errorMessage = errorData['error'] ?? 'Failed to fetch saved trips.';
-        });
+
+        // Check for JWT token expiration
+        if (errorData['error'] == 'The jwt token is no longer valid') {
+          setState(() {
+            errorMessage = 'Session expired. Please log in again.';
+          });
+
+          // Redirect to login page
+          Navigator.pushReplacementNamed(context, '/login');
+        } else {
+          setState(() {
+            errorMessage = errorData['error'] ?? 'Failed to fetch saved trips.';
+          });
+        }
       }
     } catch (e) {
       setState(() {
