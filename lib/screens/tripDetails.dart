@@ -276,17 +276,46 @@ class TripDetailsPage extends StatelessWidget {
 
                 // Delete Trip Button
                 SizedBox(height: 16),
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () => deleteTrip(context),
-                    icon: Icon(Icons.delete, color: Colors.white),
-                    label: Text(
-                      'Delete Trip',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                Builder(
+                  builder: (safeContext) => Center(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: safeContext,
+                          builder: (BuildContext dialogContext) {
+                            return AlertDialog(
+                              backgroundColor: Color.fromARGB(255, 33, 37, 41),
+                              title: Text('Confirm Delete', style: TextStyle(color: Colors.white)),
+                              content: Text(
+                                'Are you sure you want to delete this trip?',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop(); // close dialog
+                                  },
+                                  child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    Navigator.of(dialogContext).pop(); // close dialog 
+                                    await deleteTrip(safeContext); // delete
+                                  },
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                  child: Text('Delete', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.delete, color: Colors.white),
+                      label: Text('Delete Trip', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                      ),
                     ),
                   ),
                 ),
