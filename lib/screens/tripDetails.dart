@@ -10,14 +10,8 @@ class TripDetailsPage extends StatelessWidget {
   TripDetailsPage({required this.trip});
 
   Future<void> deleteTrip(BuildContext context) async {
-    final itineraryDetails = await fetchItineraryDetails(context);
-
-    if (itineraryDetails == null) {
-      return; // Exit if the itinerary details could not be fetched
-    }
-
     final userId = GlobalData.userId;
-    final itineraryId = itineraryDetails['ItineraryId']; // Correctly access ItineraryId
+    final itineraryId = trip['itineraryId']; // Use the itineraryId directly from the trip object
 
     if (userId == null || itineraryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,13 +40,7 @@ class TripDetailsPage extends StatelessWidget {
         );
 
         // Navigate back to SavedTripsPage and refresh
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SavedTripsPage(), // Ensure this is imported
-          ),
-          (route) => false, // Remove all previous routes
-        );
+        Navigator.pop(context, true); // Pass `true` to indicate success
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['error'] ?? 'Failed to delete trip')),

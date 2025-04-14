@@ -350,13 +350,16 @@ class _SavedTripsPageState extends State<SavedTripsPage> {
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                                 child: InkWell(
                                   onTap: () {
-                                    // Navigate to TripDetailsPage with the selected trip
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => TripDetailsPage(trip: savedTrips[index]),
                                       ),
-                                    );
+                                    ).then((result) {
+                                      if (result == true) {
+                                        fetchSavedTrips(); // Refresh the list if a trip was deleted
+                                      }
+                                    });
                                   },
                                   child: Card(
                                     color: Colors.grey[850],
