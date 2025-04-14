@@ -169,7 +169,8 @@ class _PlanTripPageState extends State<PlanTripPage> {
             ),
             _buildTextField('Preferences', _preferencesController),
             SizedBox(height: 16),
-            ElevatedButton(
+            Center(
+              child: ElevatedButton(
               onPressed: isLoading ? null : generateItinerary,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
@@ -178,6 +179,7 @@ class _PlanTripPageState extends State<PlanTripPage> {
               child: isLoading
                   ? CircularProgressIndicator(color: Colors.white)
                   : Text('Generate Itinerary'),
+              ),
             ),
             if (errorMessage.isNotEmpty) ...[
               SizedBox(height: 16),

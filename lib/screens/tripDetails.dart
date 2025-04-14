@@ -112,6 +112,7 @@ class TripDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         title: Text(itinerary['title'] ?? 'Trip Details', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
       ),
